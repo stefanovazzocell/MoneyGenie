@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Genie</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="panel">
+        <label for="base_salary_input"><details><summary>Base Salary</summary><p>Your base salary in CAD and the average yearly bonus you expect to receive on top of it.</p><p>If your bonus is a fixed number, add it as "Additional taxed earnings"</p></details></label>
+        <input id="base_salary_input" name="base_salary_input" class="money" type="number" min="1" step="0.01" placeholder="100000" required>
+        <div class="inputgroup even">
+            <label for="avg_yearly_bonus_input">Avg Yearly Bonus %</label>
+            <input id="avg_yearly_bonus_input" name="avg_yearly_bonus_input" class="money" type="number" min="0" max="100" step="0.1" placeholder="5%" required>
+        </div>
+        <label for="stock_input"><details><summary>Yearly Stock Awards</summary><p>Your expected yearly stock awards. Specifically Stocks that will be issued to you this year.</p></details></label>
+        <div class="inputgroup">
+            <input id="stock_input" name="stock_input" class="money" type="number" min="0" step="0.01" placeholder="40000" required>
+            <select name="stock_currency_input" id="stock_currency_input">
+                <option value="USD">USD</option>
+                <option value="CAD">CAD</option>
+            </select>
+        </div>
+        <span><details><summary>RRSP</summary><p>Your Registered Retirement Savings Plan contributions and your employer matching.</p></details></span>
+        <div class="inputgroup even">
+            <label for="rrsp_contribution_input">Contribution %</label>
+            <input id="rrsp_contribution_input" name="rrsp_contribution_input" class="money" type="number" min="0" max="50" step="0.1" placeholder="4%" required>
+        </div>
+        <div class="inputgroup even">
+            <label for="rrsp_matching_input">Matching %</label>
+            <input id="rrsp_matching_input" name="rrsp_matching_input" class="money" type="number" min="0" max="50" step="0.1" placeholder="4%" required>
+        </div>
+        <span><details><summary>ESPP</summary><p>Your Employee Stock Purchase Plan deposits and the percentage of the Fair Market Value price you pay.</p></details></span>
+        <div class="inputgroup even">
+            <label for="espp_contribution_input">Contribution %</label>
+            <input id="espp_contribution_input" name="espp_contribution_input" class="money" type="number" min="0" max="50" step="0.1" placeholder="10%" required>
+        </div>
+        <div class="inputgroup even">
+            <label for="espp_discount_input">Price/FMV %</label>
+            <input id="espp_price_input" name="espp_discount_input" class="money" type="number" min="1" max="100" step="0.1" placeholder="85%" required>
+        </div>
+        <label for="add_earnings_input"><details><summary>Additional taxed earnings</summary><p>Any additional earnings you might have that are not exempt from tax (such as investments outside of TFSA/RRSP) in CAD/year.</p></details></label>
+        <input id="add_earnings_input" name="add_earnings_input" class="money" type="number" min="0" step="0.01" placeholder="0" required>
+        <span>Settings</span>
+        <div class="inputgroup even">
+            <label for="province_input">Province</label>
+            <select name="province_input" id="province_input">
+                <option value="BC">British Columbia</option>
+                <option value="ON">Ontario</option>
+                <option value="AB">Alberta</option>
+            </select>
+        </div>
+        <div class="inputgroup even">
+            <label for="tax_year_input">Tax Year</label>
+            <select name="tax_year_input" id="tax_year_input">
+                <option value="2023">2023</option>
+            </select>
+        </div>
+        <div class="inputgroup even">
+            <input id="cad_usd_input" name="cad_usd_input" class="money" type="number" min="0.0001" step="0.0001" placeholder="1.3200" value="1.32" required>
+            <label for="cad_usd_input">CAD per 1 USD</label>
+        </div>
+        <span>Warning</span>
+        <p>
+            <b>THIS IS NOT FINANCIAL ADVICE!</b> I made this tool for my personal use and have decided to share it here for people to take a look and potentially suggest improvements or spot issues with it.<br>
+            Do <b>NOT</b> trust the results from this tool, both the calculations and the "advices" it gives - it might all be incorrect and there are likely mistakes; talk instead to a professional for financial advice, this is a toy coding project I made on a weekend, not a serious tool.
+        </p>
+        <button id="update_btn">Update</button>
+    </div>
+    <div id="main">
+        <div class="wide">
+            <p>Your <b data-html="tax_year">2023</b> gross income is $<b data-html="yearly_gross_income">0</b>, which is sourced from:</p>
+            <canvas id="sources_graph"></canvas>
+            <details>
+                <summary>Table</summary>
+                <table class="half">
+                    <tr><td>Base Salary</td> <td>$<span data-html="yearly_base_salary">0</span></td></tr>
+                    <tr><td>Bonus</td> <td>$<span data-html="yearly_bonus">0</span></td></tr>
+                    <tr><td>Stock (in CAD)</td> <td>$<span data-html="yearly_stock">0</span></td></tr>
+                    <tr><td>ESPP Bonus</td> <td>$<span data-html="yearly_espp_bonus">0</span></td></tr>
+                    <tr><td>Additional Earnings</td> <td>$<span data-html="yearly_add_earnings">0</span></td></tr>
+                </table>
+            </details>
+        </div>
+        <div class="wide">
+            <p>Your gross income will be divided as follows:</p>
+            <canvas id="outflow_graph"></canvas>
+            <details>
+                <summary>Table</summary>
+                <table class="half">
+                    <tr><td>RRSP Contributions</td> <td>$<span data-html="yearly_rrsp_contribution_employee">0</span></td></tr>
+                    <tr><td>Federal Taxes</td> <td>$<span data-html="yearly_federal_taxes">0</span> (<span data-html="yearly_federal_effective_tax_rate">0</span>%)</td></tr>
+                    <tr><td>Provincial Taxes</td> <td>$<span data-html="yearly_provincial_taxes">0</span> (<span data-html="yearly_provincial_effective_tax_rate">0</span>%)</td></tr>
+                    <tr><td>CPP Contributions</td> <td>$<span data-html="yearly_cpp_contributions">0</span> (<span data-html="yearly_cpp_effective_rate">0</span>%)</td></tr>
+                    <tr><td>EI Contributions</td> <td>$<span data-html="yearly_ei_contributions">0</span> (<span data-html="yearly_ei_effective_rate">0</span>%)</td></tr>
+                    <tr><td>Net Income</td> <td>$<span data-html="yearly_net_income">0</span></td></tr>
+                </table>
+            </details>
+        </div>
+        <div>
+            <p>To recap, your net income is <b data-html="yearly_net_income">0</b>$/year so expect to receive an average of <b data-html="monthly_net_base_income">0</b>$/month (or <b data-html="biweekly_net_income">0</b>$/bi-weekly) and <b data-html="yearly_stock_totals">0</b>$/year in stock.</p>
+            <p>Together with your employer, you're also contributing <b data-html="yearly_rrsp_contribution_total">0</b>$/year to your RRSP.</p>
+            <details>
+                <summary>Why is my monthly/bi-weekly salary different than what shown here?</summary>
+                <p>Your monthly salary might differ from this calculation due to many reasons.</p>
+                <p>One reason might be that this app averages out the CPP and EI contributions over the entire year and therefore you might receive a lower salary at the beginning of the year and, as you reach the contribution limit, you will then receive a higher net monthly salary later on.</p>
+                <p>Another reason is that any bonus you might receive is also averaged out throughout the year.</p>
+            </details>
+        </div>
+        <div class="wide">
+            <h3>Insights</h3>
+            <details data-showif="has_federal_overflow">
+                <summary>Increasing your RRSP contribution might help you get to a lower federal tax bracket.</summary>
+                <p>The top portion of your salary is currently in the <span data-html="federal_overflow_current"></span>% tax bracket.</p>
+                <p>You might want to consider increasing your contribution to the RRSP by <span data-html="federal_overflow_rrsp_change"></span>% to hit the lower <span data-html="federal_overflow_previous"></span>% tax bracket.</p>
+                <p>This will result in a decrease of your net income of <span data-html="federal_overflow_rrsp_after_net_income"></span>$/year but an increase of your RRSP of <span data-html="federal_overflow_rrsp_after_rrsp"></span>$/year</p>
+                <p>Since the RRSP is tax-deferred to your retirement you can pay lower taxes now and defer taxes on this amount to your retirement when you have a lower income and therefore are taxed less.</p>
+                <p>NOTE: Remember to make sure you're below your contribution limit for the RRSP - find out the limit in the <a target="_blank" rel="nofollow" href="https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services.html">CRA Website</a></p>
+            </details>
+            <details data-showif="has_provincial_overflow">
+                <summary>Increasing your RRSP contribution might help you get to a lower provincial tax bracket.</summary>
+                <p>The top portion of your salary is currently in the <span data-html="provincial_overflow_current"></span>% tax bracket.</p>
+                <p>You might want to consider increasing your contribution to the RRSP by <span data-html="provincial_overflow_rrsp_change"></span>% to hit the lower <span data-html="provincial_overflow_previous"></span>% tax bracket.</p>
+                <p>This will result in a decrease of your net income of <span data-html="provincial_overflow_rrsp_after_net_income"></span>$/year but an increase of your RRSP of <span data-html="provincial_overflow_rrsp_after_rrsp"></span>$/year</p>
+                <p>Since the RRSP is tax-deferred to your retirement you can pay lower taxes now and defer taxes on this amount to your retirement when you have a lower income and therefore are taxed less.</p>
+                <p>NOTE: Remember to make sure you're below your contribution limit for the RRSP - find out the limit in the <a target="_blank" rel="nofollow" href="https://www.canada.ca/en/revenue-agency/services/e-services/cra-login-services.html">CRA Website</a></p>
+            </details>
+            <details data-showif="is_cpp_maxed">
+                <summary>You maxed out CPP contributions for this year.</summary>
+                <p>Any additional increase in your income will not be affected by the Canadian Pension Plan and therefore more money will go towards your bank account.</p>
+            </details>
+            <details data-showif="is_ei_maxed">
+                <summary>You maxed out EI contributions for this year.</summary>
+                <p>Any additional increase in your income will not be affected by the Employment Insurance and therefore more money will go towards your bank account.</p>
+            </details>
+        </div>
+    </div>
+    <script src="lib/chart.js"></script>
+    <script src="taxes.js"></script>
+    <script src="social_services.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -92,7 +92,10 @@
             <details class="section">
                 <summary>Additional Taxable Earnings</summary>
                 <p>
-                    Any additional earnings you might have that are not exempt from tax (such as income from investments in unregistered accounts) in CAD/year.
+                    Any additional earnings you might have that are not exempt from tax in CAD/year.
+                </p>
+                <p>
+                    Please note that this does NOT calculate earnings from capital gains and dividents correctly.
                 </p>
                 <div>
                     <label for="additional_income_input">Additional Taxable Income</label>
@@ -117,13 +120,6 @@
                     <label for="partner_net_income">Your spouse's or common-law partner's net income (line 23600 of their return)</label>
                     <input id="partner_net_income" type="number" min="0" step="0.01" value="0" placeholder="1'000$">
                 </div>
-                <div class="if_partner hide inline">
-                    <label for="partner_caregiver">Are the caregiver for your partner?</label>
-                    <select id="partner_caregiver" required>
-                        <option value="no" selected>No</option>
-                        <option value="yes">Yes</option>
-                    </select>
-                </div>
             </details>
             <!-- Settings -->
             <details class="section">
@@ -141,7 +137,8 @@
             <div class="inline">
                 <label for="settings_year_input">Year</label>
                 <select id="settings_year_input" required>
-                    <option value="2024" selected>2024</option>
+                    <option value="2025" selected>2025</option>
+                    <option value="2024">2024</option>
                     <option value="2023">2023</option>
                 </select>
             </div>
@@ -321,6 +318,9 @@
                                     <summary>Federal Basic Personal Amount</summary>
                                     <p>
                                         The Basic Personal Amount is a non-refundable tax credit provided by the Canadian government to taxpayers to help reduce their federal income tax burden.
+                                    </p>
+                                    <p>
+                                        Note that if the taxable salary for the year is at or above the highest federal tax bracket, you will receive a lower personal basic amount.
                                     </p>
                                     <p>
                                         Read more on the <a href="https://www.canada.ca/en/revenue-agency/programs/about-canada-revenue-agency-cra/federal-government-budgets/basic-personal-amount.html" target="_blank">CRA website</a>

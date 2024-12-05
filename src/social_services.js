@@ -3,6 +3,24 @@
 // https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/canada-pension-plan-cpp/cpp-contribution-rates-maximums-exemptions.html
 
 const cpp_rates = {
+    "2025": [
+        
+        {
+            'name': "CPP Basic Exception",
+            'rate': 0,
+            'ceiling': 3500,
+        },
+        {
+            'name': "CPP",
+            'rate': 5.95,
+            'ceiling': 71300,
+        },
+        {
+            'name': "CPP2",
+            'rate': 4,
+            'ceiling': 81200,
+        },
+    ],
     "2024": [
         {
             'name': "CPP Basic Exception",
@@ -37,6 +55,10 @@ const cpp_rates = {
 // https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/employment-insurance-ei/ei-premium-rates-maximums.html
 
 const ei_rates = {
+    "2025":  {
+        'employee_rate': 1.64,
+        'max_employee_contribution': 1077.48,
+    },
     "2024":  {
         'employee_rate': 1.66,
         'max_employee_contribution': 1049.12,

@@ -1,11 +1,5 @@
 'use strict';
 
-// https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/canada-caregiver-amount.html
-const partner_caregiver_amount_by_year = {
-    "2024": 2499,
-    "2023": 2350,
-}
-
 // The maximum RRSP increase suggestion in percentage points
 const max_rrsp_increase = 12
 
@@ -97,7 +91,6 @@ function update_screen() {
     const additional_income = get_input_number_value("additional_income_input")
     const has_partner = document.querySelector("#partner_status").value == "yes"
     const partner_net_income = (has_partner ? get_input_number_value("partner_net_income") : 0)
-    const partner_caregiver = document.querySelector("#partner_caregiver").value == "yes"
     const year = document.querySelector("#settings_year_input").value
     const province = document.querySelector("#settings_province_input").value
     
@@ -109,9 +102,7 @@ function update_screen() {
     
     // More calculations...
     // - Partner tax credits
-    const partner_caregiver_amount = partner_caregiver_amount_by_year[year]
-    if (!partner_caregiver_amount) throw `Can't get the partner caregiver amount for the year "${year}"`
-    let partner_credit_applied = Math.max(federal_taxes.basic_personal_amount_applied + (partner_caregiver ? partner_caregiver_amount : 0) - partner_net_income, 0)
+    let partner_credit_applied = Math.max(federal_taxes.basic_personal_amount_applied - partner_net_income, 0)
     if (!has_partner) partner_credit_applied = 0
     const partner_credit = partner_credit_applied * federal_taxes.lowest_tax_bracket_percentage / 100
     // - Tax credits totals

@@ -4,6 +4,18 @@
 
 // Federal tax brackets
 const federal_brackets = {
+    "2025": {
+        "brackets": [
+            [57375, 15],
+            [114750, 20.5],
+            [177882, 26],
+            [253414, 29.32],
+            [Infinity, 33],
+        ],
+        "basic_personal_amount": 16129,
+        "alt_basic_personal_amount": 14538,
+        "alt_basic_personal_amount_ge": 253414,
+    },
     "2024": {
         "brackets": [
             [55867, 15],
@@ -12,7 +24,9 @@ const federal_brackets = {
             [246752, 29.32],
             [Infinity, 33],
         ],
-        "basic_personal_amount": 15000,
+        "basic_personal_amount": 15705,
+        "alt_basic_personal_amount": 14156,
+        "alt_basic_personal_amount_ge": 246752,
     },
     "2023": {
         "brackets": [
@@ -23,11 +37,27 @@ const federal_brackets = {
             [Infinity, 33],
         ],
         "basic_personal_amount": 14398,
+        "alt_basic_personal_amount": 13520,
+        "alt_basic_personal_amount_ge": 235675,
     }
 }
 
 // Provincial basic personal amounts
 const provincial_basic_personal_amount = {
+    "2025": {
+        "NL": 11067,
+        "PE": 14250,
+        "NS": 8744,
+        "NB": 16129,
+        "ON": 16129,
+        "MB": 16129,
+        "SK": 16129,
+        "AB": 22323,
+        "BC": 12932,
+        "YT": 16129,
+        "NT": 17842,
+        "NU": 16129,
+    },
     "2024": {
         "NL": 10382,
         "PE": 12750,
@@ -60,6 +90,91 @@ const provincial_basic_personal_amount = {
 
 // Provincial tax brackets
 const provincial_brackets = {
+    "2025": {
+        "NL": [
+            [44192, 8.7],
+            [88382, 14.5],
+            [157792, 15.8],
+            [220910, 17.8],
+            [282214, 19.8],
+            [564429, 20.8],
+            [1128858, 21.3],
+            [Infinity, 21.8]
+        ],
+        "PE": [
+            [33328, 9.5],
+            [64656, 13.47],
+            [105000, 16.6],
+            [140000, 17.62],
+            [140000, 19],
+        ],
+        "NS": [
+            [30507, 8.79],
+            [61015, 14.95],
+            [95883, 16.67],
+            [154650, 17.5],
+            [Infinity, 21]
+        ],
+        "NB": [
+            [51306, 9.4],
+            [102614, 14],
+            [190060, 16],
+            [Infinity, 19.5]
+        ],
+        "ON": [
+            [52886, 5.05],
+            [105775, 9.15],
+            [150000, 11.16],
+            [220000, 12.16],
+            [Infinity, 13.16]
+        ],
+        "MB": [
+            [47564, 10.8],
+            [101200, 12.75],
+            [Infinity, 17.4]
+        ],
+        "SK": [
+            [53463, 10.5],
+            [152750, 12.5],
+            [Infinity, 14.5]
+        ],
+        "AB": [
+            [151234, 10],
+            [181481, 12],
+            [241974, 13],
+            [362961, 14],
+            [Infinity, 15]
+        ],
+        "BC": [
+            [49279, 5.06],
+            [98560, 7.7],
+            [113158, 10.5],
+            [137407, 12.29],
+            [186306, 14.7],
+            [259829, 16.8],
+            [Infinity, 20.5]
+        ],
+        "YT": [
+            [57375, 6.4],
+            [114750, 9],
+            [177882, 10.9],
+            [253414, 12.93],
+            [500000, 12.8],
+            [Infinity, 15]
+        ],
+        "NT": [
+            [51964, 5.9],
+            [103930, 8.6],
+            [168967, 12.2],
+            [Infinity, 14.05]
+        ],
+        "NU": [
+            [54707, 4],
+            [109413, 7],
+            [177881, 9],
+            [Infinity, 11.5]
+        ],
+    },
     "2024": {
         "NL": [
             [43198, 8.7],
@@ -128,6 +243,7 @@ const provincial_brackets = {
             [55867, 6.4],
             [111733, 9],
             [173205, 10.9],
+            [246752, 12.93],
             [500000, 12.8],
             [Infinity, 15]
         ],
@@ -250,10 +366,18 @@ class FederalTaxes {
         if (!federal_info) {
             throw `Can't calculate federal taxes for year "${year}"`
         }
-        const [brackets, basic_personal_amount] = [federal_info["brackets"], federal_info["basic_personal_amount"]]
+        const [
+            brackets,
+            basic_personal_amount,
+            alt_basic_personal_amount,
+            alt_basic_personal_amount_ge] = [
+                federal_info["brackets"],
+                federal_info["basic_personal_amount"],
+                federal_info["alt_basic_personal_amount"],
+                federal_info["alt_basic_personal_amount_ge"]]
 
         // Calculate the tax credits
-        this.basic_personal_amount = basic_personal_amount
+        this.basic_personal_amount = (taxable_income < alt_basic_personal_amount_ge ? basic_personal_amount : alt_basic_personal_amount)
         this.basic_personal_amount_applied = Math.min(basic_personal_amount, taxable_income)
         this.lowest_tax_bracket_percentage = brackets[0][1]
         this.basic_personal_amount_credit = this.basic_personal_amount_applied * this.lowest_tax_bracket_percentage / 100
